@@ -49,7 +49,6 @@ const LanguageLearningApp: React.FC = () => {
   const [texts, setTexts] = useState<string[]>([]);
   const [selectedText, setSelectedText] = useState<string | null>(null);
   const [newText, setNewText] = useState('');
-  const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [wordAnalysis, setWordAnalysis] = useState<WordAnalysis | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -106,32 +105,6 @@ const LanguageLearningApp: React.FC = () => {
     }
   };
 
-  const saveToAnki = async (germanPhrase: string, russianTranslation: string) => {
-    try {
-      const response = await fetch('/api/anki', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ germanPhrase, russianTranslation })
-      });
-
-      if (!response.ok) {
-        throw new Error('Anki Connect error');
-      }
-
-      const result = await response.json();
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      showNotification("Successfully saved to Anki", "success");
-    } catch (error) {
-      console.error('Error saving to Anki:', error);
-      showNotification("Error saving to Anki - Please check if Anki is running", "error");
-    }
-  };
-
   const readText = (text: string) => {
     try {
       const utterance = new SpeechSynthesisUtterance(text);
@@ -177,7 +150,6 @@ const LanguageLearningApp: React.FC = () => {
   };
 
   const handleWordClick = (word: string, text: string) => {
-    setSelectedWord(word);
     analyzeWord(word, text);
   };
 
@@ -273,13 +245,6 @@ const LanguageLearningApp: React.FC = () => {
                     <p>{wordAnalysis.example.german}</p>
                     <p className="text-gray-600">{wordAnalysis.example.russian}</p>
                     <div className="flex space-x-2 mt-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => saveToAnki(wordAnalysis.example.german, wordAnalysis.example.russian)}
-                      >
-                        Save to Anki
-                      </Button>
                       <Button 
                         variant="outline" 
                         size="sm"
